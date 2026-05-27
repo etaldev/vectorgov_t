@@ -4,6 +4,7 @@ import { AnaliseReequilibrioSchema } from "@vectorgov-t/schemas";
 import { __internal } from "../src/api/peticoes.js";
 
 describe("api/peticoes mock de analise", () => {
+  const goldenSetEnv = { ENABLE_GOLDEN_SET_MOCKS: "true" };
   const casos = [
     ["012/2024", "procedente", 0.75, null],
     ["045/2023", "improcedente", 0.7, null],
@@ -15,9 +16,13 @@ describe("api/peticoes mock de analise", () => {
   it.each(casos)(
     "gera veredito compativel com golden set para contrato %s",
     (contrato, veredito, scoreMin, scoreMax) => {
-      const analise = __internal.gerarAnaliseMock(randomUUID(), {
-        contrato_numero: contrato,
-      }) as Record<string, unknown>;
+      const analise = __internal.gerarAnaliseMock(
+        randomUUID(),
+        {
+          contrato_numero: contrato,
+        },
+        goldenSetEnv,
+      ) as Record<string, unknown>;
 
       const parsed = AnaliseReequilibrioSchema.safeParse(analise);
       expect(parsed.success).toBe(true);
@@ -35,9 +40,13 @@ describe("api/peticoes mock de analise", () => {
   );
 
   it("inclui citacoes obrigatorias do caso IBS/CBS", () => {
-    const analise = __internal.gerarAnaliseMock(randomUUID(), {
-      contrato_numero: "012/2024",
-    }) as { citacoes: Array<{ norma: string; artigo: string }> };
+    const analise = __internal.gerarAnaliseMock(
+      randomUUID(),
+      {
+        contrato_numero: "012/2024",
+      },
+      goldenSetEnv,
+    ) as { citacoes: Array<{ norma: string; artigo: string }> };
 
     expect(analise.citacoes).toEqual(
       expect.arrayContaining([
@@ -55,5 +64,14 @@ describe("api/peticoes mock de analise", () => {
         }),
       ]),
     );
+  });
+
+  it("nao ativa respostas fixas do golden set sem flag explicita", () => {
+    const analise = __internal.gerarAnaliseMock(randomUUID(), {
+      contrato_numero: "012/2024",
+    }) as Record<string, unknown>;
+
+    expect(analise.veredito).toBe("parcialmente_procedente");
+    expect(analise.score_confianca).toBe(0.82);
   });
 });

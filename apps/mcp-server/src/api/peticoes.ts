@@ -94,6 +94,11 @@ function contratoNumero(metadata: Record<string, unknown>): string {
   return String(raw).trim();
 }
 
+function envFlagEnabled(value: string | undefined): boolean {
+  if (!value) return false;
+  return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
+}
+
 function citacaoMock(
   id: string,
   tipoFonte:
@@ -301,10 +306,13 @@ function analiseMockPorContrato(
 function gerarAnaliseMock(
   peticaoId: string,
   metadata: Record<string, unknown>,
+  env?: Pick<Env, "ENABLE_GOLDEN_SET_MOCKS">,
 ): unknown {
   const agora = new Date().toISOString();
-  const goldenSetAnalise = analiseMockPorContrato(contratoNumero(metadata));
-  if (goldenSetAnalise) {
+  const goldenSetAnalise = envFlagEnabled(env?.ENABLE_GOLDEN_SET_MOCKS)
+    ? analiseMockPorContrato(contratoNumero(metadata))
+    : null;
+  if (goldenSetAnalise !== null) {
     return {
       id: newPeticaoId(),
       peticao_id: peticaoId,
@@ -558,7 +566,7 @@ async function simularPipeline(
         fase: "done",
         progresso_pct: 100,
         atualizado_em: new Date().toISOString(),
-        analise: gerarAnaliseMock(record.id, record.metadata),
+        analise: gerarAnaliseMock(record.id, record.metadata, env),
       };
       await writeRecord(env, final);
     })(),
