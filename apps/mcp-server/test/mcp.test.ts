@@ -32,7 +32,7 @@ async function rpcCall(
 }
 
 describe("POST /mcp/v1 — tools/list", () => {
-  it("retorna as 4 tools de skills registradas em F2.E", async () => {
+  it("retorna catálogo com 13 tools (9 leis Track D + 4 skills Track E)", async () => {
     const { status, json } = await rpcCall({
       jsonrpc: "2.0",
       id: 1,
@@ -45,17 +45,33 @@ describe("POST /mcp/v1 — tools/list", () => {
       tools: Array<{ name: string; description: string; inputSchema: unknown }>;
     };
     expect(Array.isArray(result.tools)).toBe(true);
-    const nomes = result.tools.map((t) => t.name).sort();
-    expect(nomes).toEqual([
+    expect(result.tools).toHaveLength(13);
+    const names = result.tools.map((t) => t.name);
+    // Leis primeiro (ordem do array MCP_TOOLS — Track D)
+    expect(names.slice(0, 9)).toEqual([
+      "buscar_legislacao",
+      "consultar_artigo",
+      "listar_artigos_por_tema",
+      "comparar_redacoes",
+      "fs_listar_normas",
+      "fs_listar_estrutura",
+      "fs_ler_dispositivo",
+      "fs_ler_intervalo",
+      "fs_grep",
+    ]);
+    // Skills depois (ordem do registry — Track E)
+    expect(names.slice(9).sort()).toEqual([
       "skill_carregar",
       "skill_identificar_relevantes",
       "skill_listar",
       "skill_publicar",
     ]);
-    // Cada descritor deve ter inputSchema (JSON Schema válido).
+    // Cada tool deve ter description e inputSchema válidos.
     for (const t of result.tools) {
       expect(typeof t.description).toBe("string");
-      expect(typeof t.inputSchema).toBe("object");
+      expect(t.description.length).toBeGreaterThan(10);
+      const schema = t.inputSchema as Record<string, unknown>;
+      expect(schema.type).toBe("object");
     }
   });
 
