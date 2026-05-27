@@ -94,12 +94,12 @@ export const FundamentacaoJuridicaSchema = z.object({
   "movimentos": [
     {
       "titulo": "subsuncao",
-      "texto": "A petição enquadra-se no Art. 124, II, 'd', da Lei 14.133/2021, que admite a alteração contratual quando \"sobrevierem fatos imprevisíveis, ou previsíveis porém de consequências incalculáveis, retardadores ou impeditivos da execução do ajustado, ou, ainda, em caso de força maior, caso fortuito ou fato do príncipe, configurando álea econômica extraordinária e extracontratual\". Os autos demonstram (i) posterioridade do fato (elevação do aço a partir de jan/2026, contrato assinado em mar/2024); (ii) imprevisibilidade objetiva (variação trienal média do INPC-construção: ±9%; variação observada: 47%); (iii) extraordinariedade (excede em mais de 5x a banda histórica); e (iv) extracontratualidade (a matriz de riscos do Anexo III do contrato não aloca o risco de alta extraordinária de aço à contratada).",
+      "texto": "A petição enquadra-se no Art. 124, II, 'd', da Lei 14.133/2021, que admite a alteração contratual \"para restabelecer o equilíbrio econômico-financeiro inicial do contrato em caso de força maior, caso fortuito ou fato do príncipe ou em decorrência de fatos imprevisíveis ou previsíveis de consequências incalculáveis, retardadores ou impeditivos da execução do ajustado, ou ainda em caso de impedimento de sua execução por fato ou ato de terceiro reconhecido pela Administração em documento contemporâneo à sua ocorrência\". Conforme construção doutrinária consolidada (Marçal Justen Filho, Egon Bockmann), o dispositivo abriga a chamada \"álea econômica extraordinária e extracontratual\". Os autos demonstram (i) posterioridade do fato (elevação do aço a partir de jan/2026, contrato assinado em mar/2024); (ii) imprevisibilidade objetiva (variação trienal média do INPC-construção: ±9%; variação observada: 47%); (iii) extraordinariedade (excede em mais de 5x a banda histórica); e (iv) extracontratualidade (a matriz de riscos do Anexo III do contrato não aloca o risco de alta extraordinária de aço à contratada).",
       "citacoes": [
         {
           "tipo": "lei",
           "referencia": "Lei 14.133/2021, Art. 124, II, 'd'",
-          "trecho_literal": "sobrevierem fatos imprevisíveis, ou previsíveis porém de consequências incalculáveis, retardadores ou impeditivos da execução do ajustado, ou, ainda, em caso de força maior, caso fortuito ou fato do príncipe, configurando álea econômica extraordinária e extracontratual"
+          "trecho_literal": "para restabelecer o equilíbrio econômico-financeiro inicial do contrato em caso de força maior, caso fortuito ou fato do príncipe ou em decorrência de fatos imprevisíveis ou previsíveis de consequências incalculáveis, retardadores ou impeditivos da execução do ajustado, ou ainda em caso de impedimento de sua execução por fato ou ato de terceiro reconhecido pela Administração em documento contemporâneo à sua ocorrência"
         }
       ]
     }
@@ -108,6 +108,8 @@ export const FundamentacaoJuridicaSchema = z.object({
 ```
 
 ### Exemplo 2 — Movimento de jurisprudência
+
+> Aviso: os Acórdãos do TCU citados a seguir (1.595/2018-Plenário e 2.860/2023-Plenário) são **exemplos hipotéticos meramente ilustrativos da estrutura argumentativa esperada** — devem ser substituídos por jurisprudência confirmada (via skill `verificacao-citacoes-literais` + tool `lei_buscar_jurisprudencia`) antes de qualquer uso em produção.
 
 ```json
 {
@@ -131,11 +133,13 @@ export const FundamentacaoJuridicaSchema = z.object({
 }
 ```
 
+> Lembrete: substituir os Acórdãos 1.595/2018-Plenário e 2.860/2023-Plenário por jurisprudência confirmada antes do uso em produção.
+
 ## Erros a evitar
 
 - **Citar dispositivos inexistentes ou com redação errada**: cada citação literal precisa ser passada por `verificacao-citacoes-literais` antes da finalização.
 - **Fundamentar apenas em doutrina**: doutrina é acessória; o eixo é a lei + jurisprudência.
 - **Mencionar a Lei 8.666/93 em contrato da Lei 14.133/2021**: erro grosseiro, salvo regra de transição expressa.
 - **Subsumir genericamente ("o caso se enquadra na lei")**: a subsunção precisa percorrer cada elemento do tipo legal.
-- **Ignorar a matriz de riscos do contrato**: contratos sob a Lei 14.133/2021 frequentemente têm matriz de riscos (Art. 22, X) que altera o resultado da extracontratualidade.
+- **Ignorar a matriz de riscos do contrato**: contratos sob a Lei 14.133/2021 frequentemente têm matriz de riscos (disciplinada nos §§3º a 5º do Art. 22 da Lei 14.133/2021) que altera o resultado da extracontratualidade.
 - **Citar a EC 132/2023 ou LC 214/2025 sem dimensão tributária no caso**: estes só se aplicam quando o fato gerador envolver mudança de regime IBS/CBS, alíquota, ou regra de transição tributária.

@@ -131,9 +131,46 @@ Saída (parcial):
 }
 ```
 
+### Exemplo 3 — Superveniente (transição tributária IBS/CBS)
+
+Cenário: contrato administrativo firmado em 2025 (regime ICMS/ISS/PIS/COFINS). Em 2026, entra em vigor a CBS (`EC 132/2023`, regulamentada pela `LC 214/2025`), alterando a carga tributária incidente sobre o objeto contratado em magnitude que extrapola a álea ordinária. O contrato não previu cláusula específica de neutralidade tributária para a transição.
+
+Saída (parcial):
+```json
+{
+  "superveniente": true,
+  "elementos": {
+    "posterioridade": {
+      "verificado": true,
+      "data_evento": "2026-01-01",
+      "data_assinatura_contrato": "2025-04-10",
+      "dias_entre": 266
+    },
+    "imprevisibilidade": {
+      "verificado": true,
+      "justificativa": "Embora a EC 132/2023 já estivesse promulgada à época da contratação, a regulamentação infraconstitucional (LC 214/2025) só foi editada após a assinatura, fixando alíquotas e regras de transição em patamar não antecipável objetivamente.",
+      "indicadores_objetivos": [
+        "Promulgação da LC 214/2025 posterior ao contrato",
+        "Ausência de minuta consolidada na data da licitação"
+      ]
+    },
+    "extraordinariedade": {
+      "verificado": true,
+      "justificativa": "Alteração estrutural do sistema tributário extrapola a álea ordinária prevista no Art. 124, II, 'd', combinada com o Art. 195, V, da CF (incluído pela EC 132/2023)."
+    },
+    "extracontratualidade": {
+      "verificado": true,
+      "clausula_de_risco_aplicavel": null,
+      "justificativa": "O contrato não atribui à contratada o risco de mudança de regime tributário decorrente da Reforma Tributária."
+    }
+  },
+  "fundamentacao": "Caracteriza-se fato superveniente apto a ensejar reequilíbrio: Art. 124, II, 'd', da Lei 14.133/2021, combinado com a EC 132/2023 (Art. 195, V, CF) e a LC 214/2025, que instituiu a CBS e seu regime de transição."
+}
+```
+
 ## Erros a evitar
 
 - **Posterioridade contra a data da proposta**: o marco é a assinatura do contrato, não a apresentação da proposta nem o edital.
 - **Confundir imprevisibilidade com surpresa subjetiva da contratada**: o critério é objetivo (um licitante diligente).
-- **Ignorar a matriz de riscos**: contratos firmados sob a Lei 14.133/2021 frequentemente têm matriz de riscos explícita (`Art. 22, X`) — se o risco está lá alocado à contratada, não há extracontratualidade.
+- **Ignorar a matriz de riscos**: contratos firmados sob a Lei 14.133/2021 frequentemente têm matriz de riscos explícita (disciplinada nos `§§3º a 5º do Art. 22` da Lei 14.133/2021) — se o risco está lá alocado à contratada, não há extracontratualidade.
 - **Usar variação nominal sem deflator**: comparar 38% de aumento em ano de alta inflação ignorando o deflator distorce a análise — sempre confrontar com banda histórica em termos reais.

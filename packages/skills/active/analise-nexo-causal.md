@@ -135,6 +135,6 @@ Saída (parcial):
 ## Erros a evitar
 
 - **Atribuir 100% ao fato quando há concausas**: o reequilíbrio não cobre risco assumido nem ineficiência da contratada.
-- **Confundir inadimplemento da Administração com concausa que reduz reequilíbrio**: o inadimplemento da Administração GERA indenização autônoma (`Art. 138, II`) e NÃO deve ser descontado do valor do reequilíbrio.
+- **Confundir inadimplemento da Administração com concausa que reduz reequilíbrio**: o inadimplemento da Administração GERA indenização autônoma — fundamento direto no `Art. 137, §2º, da Lei 14.133/2021` (indenização nos casos de extinção por culpa exclusiva da Administração) e/ou, supletivamente, na regra geral de responsabilidade civil objetiva do Estado (`Art. 37, §6º, da Constituição Federal`) — e NÃO deve ser descontado do valor do reequilíbrio.
 - **Quantificar sem evidências**: a `evidencias` é array obrigatório com pelo menos 1 item — notas fiscais, planilhas, índices oficiais. Estimativas "de cabeça" devem ir para `concausas[].impacto_estimado_reais` apenas se houver memória de cálculo anexa.
 - **Tratar correlação como causalidade**: dois eventos contemporâneos não estabelecem nexo; é preciso ligação técnica documentada.

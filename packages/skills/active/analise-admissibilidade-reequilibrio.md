@@ -41,7 +41,7 @@ Não use para:
 Verificar, em ordem, os 5 requisitos:
 
 1. **Legitimidade ativa**: requerente é a contratada (ou consórcio contratado, ou cessionário com anuência). Subcontratado não tem legitimidade.
-2. **Interesse processual**: o contrato está vigente OU encerrado há menos do prazo prescricional do `Art. 137` da Lei 14.133/2021 (5 anos).
+2. **Interesse processual**: o contrato está vigente OU encerrado há menos do prazo prescricional quinquenal contra a Fazenda Pública (`Decreto 20.910/1932`). O `Art. 137 da Lei 14.133/2021` cuida de **motivos de extinção contratual** e não fundamenta o prazo de prescrição.
 3. **Prova mínima do fato gerador**: documentos demonstrando (a) ocorrência objetiva do fato, (b) cronologia (data antes do desequilíbrio), (c) externalidade (fato alheio à conduta da contratada).
 4. **Prova mínima do impacto econômico**: planilha analítica de custos OU laudo técnico OU índices oficiais aplicáveis ao objeto.
 5. **Enquadramento legal**: o fato narrado se subsume a alguma hipótese do `Art. 124, II, 'd'` da Lei 14.133/2021 — força maior, caso fortuito, fato do príncipe, fato da administração, ou álea econômica extraordinária e extracontratual.
@@ -138,6 +138,6 @@ Saída (parcial):
 
 - **Confundir conhecimento com procedência**: admissibilidade é juízo formal; mérito vem depois.
 - **Exigir prova plena na admissibilidade**: o filtro é `prova mínima`, não certeza absoluta.
-- **Esquecer prescrição**: o `Art. 137` (5 anos) corre da data do fato gerador, não do protocolo do pedido — calcular a partir da data informada em `peticao.fato_gerador.data_alegada`.
+- **Esquecer prescrição**: o prazo quinquenal do `Decreto 20.910/1932` corre da data do fato gerador, não do protocolo do pedido — calcular a partir da data informada em `peticao.fato_gerador.data_alegada`. Não confundir com o `Art. 137 da Lei 14.133/2021`, que trata de extinção contratual.
 - **Tratar reajuste como reequilíbrio**: reajuste por IPCA/IGPM é rito do `Art. 134`; aqui só entra revisão por álea extraordinária.
 - **Citar a Lei 8.666/93**: contratos firmados sob a Lei 14.133/2021 não admitem fundamentação em diploma revogado, salvo para contratos remanescentes do regime anterior (regra de transição).

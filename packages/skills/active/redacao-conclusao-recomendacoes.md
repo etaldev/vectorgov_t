@@ -114,8 +114,8 @@ export const ConclusaoRecomendacoesSchema = z.object({
     {
       "ordem": 2,
       "tipo": "comunicacao",
-      "descricao": "Cientificar a contratada da glosa de R$ 90.000,00 referente à parcela atribuível à ineficiência operacional, abrindo prazo recursal de 5 dias úteis.",
-      "prazo_dias": 5,
+      "descricao": "Cientificar a contratada da glosa de R$ 90.000,00 referente à parcela atribuível à ineficiência operacional, abrindo prazo recursal de 3 dias úteis (Art. 165 da Lei 14.133/2021 — recurso administrativo).",
+      "prazo_dias": 3,
       "responsavel": "Setor de contratos"
     },
     {
@@ -146,7 +146,7 @@ export const ConclusaoRecomendacoesSchema = z.object({
     {
       "ordem": 1,
       "tipo": "comunicacao",
-      "descricao": "Notificar a contratada da decisão, com abertura de prazo recursal de 5 dias úteis (Art. 168, V, da Lei 14.133/2021).",
+      "descricao": "Notificar a contratada da decisão, com abertura de prazo recursal de 3 dias úteis (Art. 165 da Lei 14.133/2021 — recurso administrativo).",
       "prazo_dias": 3,
       "responsavel": "Setor de contratos"
     }
@@ -158,7 +158,7 @@ export const ConclusaoRecomendacoesSchema = z.object({
 
 - **Conclusão genérica ("opina-se pela legalidade")**: tem que indicar o ato concreto recomendado.
 - **Recomendar termo aditivo sem definir o valor**: a Administração não pode lavrar aditivo "em branco".
-- **Esquecer prazo recursal da contratada**: o `Art. 168` da Lei 14.133/2021 garante recurso administrativo; o parecer deve sinalizar abertura do prazo.
+- **Esquecer prazo recursal da contratada**: o `Art. 165` da Lei 14.133/2021 disciplina o recurso administrativo (em regra, 3 dias úteis — conferir se há hipóteses especiais aplicáveis ao caso); o parecer deve sinalizar a abertura do prazo. Atenção: o `Art. 168` trata de **impugnação ao edital**, não de recurso administrativo contra decisão de execução contratual.
 - **Misturar conclusão com fundamentação**: a conclusão sintetiza, não argumenta. Argumentação ficou na seção 5.
 - **Recomendar ao TCU quando não há valor relevante**: nem todo aditivo demanda comunicação automática ao Tribunal de Contas — verificar o regimento local.
 - **Confundir indeferimento de mérito com não-conhecimento**: se falhou requisito formal (legitimidade, prazo), é `nao_conhecimento`; se falhou mérito (não há fato superveniente), é `indeferimento`.

@@ -1,6 +1,6 @@
 ---
 nome: verificacao-prazo-pedido
-descricao: "Verifica o cumprimento dos prazos legais e contratuais para protocolo do pedido de reequilíbrio: prescrição quinquenal do Art. 137 da Lei 14.133/2021, prazos contratuais específicos e marco inicial."
+descricao: "Verifica o cumprimento dos prazos legais e contratuais para protocolo do pedido de reequilíbrio: prescrição quinquenal contra a Fazenda Pública (Decreto 20.910/1932), prazos contratuais específicos e marco inicial."
 trigger:
   palavras_chave:
     - prazo
@@ -41,8 +41,8 @@ Não use para:
 Aplicar os 3 marcos em sequência:
 
 1. **Marco contratual**: o contrato exige notificação prévia em prazo específico (ex.: 30 dias do conhecimento)? Se sim, o pedido também precisa atender essa janela.
-2. **Marco prescricional legal**: `Art. 137 da Lei 14.133/2021` — prescreve em 5 anos contados da data em que o credor poderia exigir o direito (em geral, a data do fato gerador, salvo se a contratada só pudesse conhecer o impacto posteriormente).
-3. **Marco contratual de extinção**: se o contrato já se extinguiu, o pedido ainda é cabível dentro da prescrição quinquenal, mas com regime de execução por cobrança ordinária, não revisão contratual stricto sensu.
+2. **Marco prescricional legal**: `Decreto 20.910/1932` (prescrição quinquenal de toda e qualquer pretensão contra a Fazenda Pública) — prescreve em 5 anos contados da data em que o credor poderia exigir o direito (em geral, a data do fato gerador, salvo se a contratada só pudesse conhecer o impacto posteriormente). Observação: o `Art. 137 da Lei 14.133/2021` cuida de **motivos de extinção contratual**, não de prescrição — não confundir.
+3. **Marco contratual de extinção**: se o contrato já se extinguiu (vide hipóteses do `Art. 137 da Lei 14.133/2021`), o pedido ainda é cabível dentro da prescrição quinquenal do Decreto 20.910/1932, mas com regime de execução por cobrança ordinária, não revisão contratual stricto sensu.
 
 Aplicar a fórmula:
 ```
@@ -70,8 +70,11 @@ export const VerificacaoPrazoSchema = z.object({
     dies_a_quo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   }),
   prazo_prescricional: z.object({
-    fundamento_legal: z.literal("Art. 137 da Lei 14.133/2021"),
-    duracao_anos: z.literal(5),
+    fundamento_legal: z.string().describe(
+      "Ex.: 'Decreto 20.910/1932' (prescrição quinquenal contra a Fazenda); " +
+      "'Art. 137 da Lei 14.133/2021' aplica-se a hipóteses de extinção contratual, não de prescrição."
+    ),
+    duracao_anos: z.number().int().positive().default(5),
     fim: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     dias_restantes_no_protocolo: z.number().int(),
   }),
@@ -102,7 +105,7 @@ Saída (parcial):
     "dies_a_quo": "2024-03-15"
   },
   "prazo_prescricional": {
-    "fundamento_legal": "Art. 137 da Lei 14.133/2021",
+    "fundamento_legal": "Decreto 20.910/1932 (prescrição quinquenal contra a Fazenda Pública)",
     "duracao_anos": 5,
     "fim": "2029-03-15",
     "dias_restantes_no_protocolo": 1049
@@ -133,6 +136,6 @@ Saída (parcial):
 
 - **Confundir dies a quo do fato com dies a quo do conhecimento**: para impactos diferidos (ex.: alta de combustível só se materializa nos meses seguintes), o `dies_a_quo` é o conhecimento inequívoco, não o evento puro.
 - **Ignorar cláusulas de notificação prévia**: contratos administrativos modernos frequentemente impõem prazos contratuais menores que o quinquenal — descumprí-los gera preclusão.
-- **Usar o prazo da Lei 8.666/93 (decreto 20.910/1932 — 5 anos)**: aqui o fundamento direto é o Art. 137 da Lei 14.133/2021.
+- **Confundir prescrição com extinção contratual**: o `Decreto 20.910/1932` é o fundamento da prescrição quinquenal contra a Fazenda Pública. O `Art. 137 da Lei 14.133/2021` trata de **motivos de extinção** do contrato — usá-lo como base prescricional é erro técnico.
 - **Calcular o prazo em dias úteis**: prescrição civil/administrativa conta dias corridos.
 - **Confundir prescrição com decadência**: o direito ao reequilíbrio é de natureza patrimonial e prescreve; não há decadência aplicável.
