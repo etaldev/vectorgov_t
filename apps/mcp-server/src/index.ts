@@ -23,6 +23,8 @@ import { handleMcp } from "./mcp/server.js";
 // `class_name = "NotebookAgent"` declarado em wrangler.toml a partir
 // do export default do Worker.
 export { NotebookAgent } from "./agents/notebook-agent.js";
+// SessionAgent — DO global pra histórico de análises/pareceres (PEVS).
+export { SessionAgent } from "./agents/session-agent.js";
 import { enforceRateLimit } from "./lib/rate-limit.js";
 import { corsHeaders, withSecurity } from "./lib/security.js";
 import { errorResponse, jsonResponse } from "./lib/responses.js";
