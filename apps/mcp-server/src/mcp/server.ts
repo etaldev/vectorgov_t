@@ -21,6 +21,13 @@ import {
   jsonRpcSuccess,
   type JsonRpcId,
 } from "../lib/responses.js";
+import {
+  listToolDescriptors,
+  invokeTool,
+  findTool,
+  ToolInputError,
+  ToolExecutionError,
+} from "./tools/index.js";
 
 /**
  * Estrutura mínima de uma requisição JSON-RPC 2.0.
@@ -82,16 +89,15 @@ async function dispatch(
   method: string,
   params: unknown,
   id: JsonRpcId,
-  _env: Env,
+  env: Env,
 ): Promise<ReturnType<typeof jsonRpcSuccess> | ReturnType<typeof jsonRpcError>> {
   switch (method) {
     case "tools/list": {
-      const result: ToolsListResult = { tools: [] };
+      const result: ToolsListResult = { tools: listToolDescriptors() };
       return jsonRpcSuccess(id, result);
     }
     case "tools/call": {
-      // Validação mínima de params — protege contra payloads malformados
-      // mesmo sem nenhuma tool cadastrada.
+      // Validação mínima de params — protege contra payloads malformados.
       if (!isObjectLike(params)) {
         return jsonRpcError(
           id,
@@ -107,12 +113,28 @@ async function dispatch(
           "Invalid params: 'name' (string) é obrigatório",
         );
       }
-      // Nenhuma tool cadastrada ainda — F2 implementa o registry real.
-      return jsonRpcError(
-        id,
-        -32601,
-        `Tool not found: ${callParams.name}`,
-      );
+      // Tool não existente — usa `findTool` antes de `invokeTool` para
+      // distinguir "not found" (-32601) de "execução falhou" (-32603).
+      if (!findTool(callParams.name)) {
+        return jsonRpcError(
+          id,
+          -32601,
+          `Tool not found: ${callParams.name}`,
+        );
+      }
+      try {
+        const data = await invokeTool(env, callParams.name, callParams.arguments);
+        return jsonRpcSuccess(id, { content: data });
+      } catch (err) {
+        if (err instanceof ToolInputError) {
+          return jsonRpcError(id, -32602, err.message, err.details);
+        }
+        if (err instanceof ToolExecutionError) {
+          return jsonRpcError(id, -32603, err.message, err.details);
+        }
+        const message = err instanceof Error ? err.message : "Unknown error";
+        return jsonRpcError(id, -32603, "Internal error", { reason: message });
+      }
     }
     default: {
       return jsonRpcError(id, -32601, `Method not found: ${method}`);

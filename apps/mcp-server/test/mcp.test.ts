@@ -32,7 +32,7 @@ async function rpcCall(
 }
 
 describe("POST /mcp/v1 — tools/list", () => {
-  it("retorna { tools: [] } sem tools cadastradas (F1)", async () => {
+  it("retorna as 4 tools de skills registradas em F2.E", async () => {
     const { status, json } = await rpcCall({
       jsonrpc: "2.0",
       id: 1,
@@ -41,9 +41,22 @@ describe("POST /mcp/v1 — tools/list", () => {
     expect(status).toBe(200);
     expect(json.jsonrpc).toBe("2.0");
     expect(json.id).toBe(1);
-    const result = json.result as { tools: unknown[] };
+    const result = json.result as {
+      tools: Array<{ name: string; description: string; inputSchema: unknown }>;
+    };
     expect(Array.isArray(result.tools)).toBe(true);
-    expect(result.tools).toHaveLength(0);
+    const nomes = result.tools.map((t) => t.name).sort();
+    expect(nomes).toEqual([
+      "skill_carregar",
+      "skill_identificar_relevantes",
+      "skill_listar",
+      "skill_publicar",
+    ]);
+    // Cada descritor deve ter inputSchema (JSON Schema válido).
+    for (const t of result.tools) {
+      expect(typeof t.description).toBe("string");
+      expect(typeof t.inputSchema).toBe("object");
+    }
   });
 
   it("preserva ID string da requisição", async () => {
