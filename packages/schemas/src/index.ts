@@ -9,6 +9,8 @@
  *   - `ingestion`: schemas dos endpoints do orchestrator (IngestaoIniciarInput,
  *     IngestaoStatus, IngestaoFase).
  *   - `mcp-tools`: schemas das 9 tools do MCP server (busca, consulta, filesystem).
+ *   - `skills`: SkillMetadata, SkillListItem, SkillFull, MetaIndex + I/O das
+ *     4 tools MCP de skills (listar, carregar, identificar, publicar).
  *   - `peticao`: input do Feature 1 (análise de pedido de reequilíbrio).
  *   - `analise`: output do Feature 1, assinada pelo Auditor.
  *   - `parecer`: output do Feature 2, produzido pelo Redator.
@@ -30,6 +32,9 @@ export const VERSION = "0.1.0";
 export * from "./pipeline.js";
 export * from "./ingestion.js";
 export * from "./mcp-tools.js";
+
+// Skills system (Track E)
+export * from "./skills.js";
 
 // Sistema agêntico (Track F)
 export * from "./peticao.js";
