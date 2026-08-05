@@ -31,9 +31,10 @@ name: Catálogo CATMAT/CATSER — atualização agendada
 
 on:
   schedule:
-    # Dia 5 de cada mês, 06:20 UTC (03:20 BRT) — fora de janelas de publicação
-    # da fonte e de horário comercial.
-    - cron: "20 6 5 * *"
+    # Toda QUARTA 06:20 UTC (03:20 BRT) — decisão do founder em 05/08/2026
+    # (D2 da SPEC-CRONS-TCU-CATMAT-MONITOR do monorepo): semanal, fora de
+    # janelas de publicação da fonte e de horário comercial.
+    - cron: "20 6 * * 3"
   workflow_dispatch:
     inputs:
       mode:
