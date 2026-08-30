@@ -22,6 +22,7 @@
 // parse-csv.mjs (que segue válido para carga manual a partir do CSV local).
 import { createWriteStream, mkdirSync } from "node:fs";
 import { sanearGrupo } from "./sane-grupos.mjs";
+import { criarBuscadorPagina, PAUSA_ENTRE_PAGINAS_MS } from "./paginacao.mjs";
 
 const args = process.argv.slice(2);
 const OUT = (() => {
@@ -39,7 +40,7 @@ mkdirSync(OUT, { recursive: true });
 const BASE =
   "https://dadosabertos.compras.gov.br/modulo-material/4_consultarItemMaterial";
 const TAMANHO_PAGINA = 500; // máximo aceito pela API
-const PAUSA_ENTRE_PAGINAS_MS = 150; // cortesia: ~688 páginas em sequência
+// Pacing e retry (429/5xx) moram em paginacao.mjs — orçamento único da fonte.
 
 // Gate de sanidade da fonte: o catálogo completo tem ~343k itens; menos que
 // isso indica truncamento/paginação quebrada — abortar em vez de gerar um
@@ -81,24 +82,7 @@ function montarTextoEmbed(descricao, pdm, classe) {
     .join(" ");
 }
 
-async function buscarPagina(pagina, tentativa = 1) {
-  const url = `${BASE}?pagina=${pagina}&tamanhoPagina=${TAMANHO_PAGINA}`;
-  const res = await fetch(url, {
-    headers: { accept: "application/json" },
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!res.ok) {
-    const corpo = (await res.text()).slice(0, 300);
-    if ((res.status === 429 || res.status >= 500) && tentativa <= 4) {
-      const espera = 1000 * 2 ** (tentativa - 1);
-      console.warn(`  ${res.status} na página ${pagina} — retry em ${espera}ms`);
-      await new Promise((r) => setTimeout(r, espera));
-      return buscarPagina(pagina, tentativa + 1);
-    }
-    throw new Error(`API ${res.status} na página ${pagina}: ${corpo}`);
-  }
-  return res.json();
-}
+const buscarPagina = criarBuscadorPagina({ base: BASE, tamanhoPagina: TAMANHO_PAGINA });
 
 const sqlStr = (v) => (v === null ? "NULL" : `'${String(v).replace(/'/g, "''")}'`);
 

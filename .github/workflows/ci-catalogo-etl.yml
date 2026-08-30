@@ -1,0 +1,40 @@
+name: CI Catálogo ETL
+
+# Validação de PR do ETL do catálogo (P1 do review do PR #69): antes disto,
+# NENHUM check rodava em pull_request para scripts/catalogo-etl/** — o
+# workflow agendado (catalogo-etl.yml) só aceita schedule/dispatch, e uma
+# regressão só apareceria no cron seguinte, em produção.
+#
+# Escopo DELIBERADAMENTE seco: testes dep-free + checagem de sintaxe.
+# Nada de fetch na fonte, D1, Vectorize ou segredos num contexto de PR.
+on:
+  pull_request:
+    paths:
+      - 'scripts/catalogo-etl/**'
+      - '.github/workflows/ci-catalogo-etl.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-catalogo-etl-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scripts/catalogo-etl
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Testes (planner + backoff + paginação — sem rede)
+        run: npm test
+
+      - name: Sintaxe dos scripts de fetch
+        run: |
+          node --check fetch-catmat.mjs
+          node --check fetch-catser.mjs

@@ -16,6 +16,7 @@
 // embed.mjs) + out/catser-d1.sql. Ver README para a ordem de aplicação.
 import { createWriteStream, mkdirSync } from "node:fs";
 import { sanearGrupo } from "./sane-grupos.mjs";
+import { criarBuscadorPagina } from "./paginacao.mjs";
 
 const args = process.argv.slice(2);
 const OUT = (() => {
@@ -43,24 +44,8 @@ function classeValida(classe) {
   return norm !== "INVALIDO" && norm !== "INVALIDA";
 }
 
-async function buscarPagina(pagina, tentativa = 1) {
-  const url = `${BASE}?pagina=${pagina}&tamanhoPagina=${TAMANHO_PAGINA}`;
-  const res = await fetch(url, {
-    headers: { accept: "application/json" },
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!res.ok) {
-    const corpo = (await res.text()).slice(0, 300);
-    if ((res.status === 429 || res.status >= 500) && tentativa <= 4) {
-      const espera = 1000 * 2 ** (tentativa - 1);
-      console.warn(`  ${res.status} na página ${pagina} — retry em ${espera}ms`);
-      await new Promise((r) => setTimeout(r, espera));
-      return buscarPagina(pagina, tentativa + 1);
-    }
-    throw new Error(`API ${res.status} na página ${pagina}: ${corpo}`);
-  }
-  return res.json();
-}
+// Retry (429/5xx) mora em paginacao.mjs — caminho coberto por paginacao.test.mjs.
+const buscarPagina = criarBuscadorPagina({ base: BASE, tamanhoPagina: TAMANHO_PAGINA });
 
 const sqlStr = (v) => (v === null ? "NULL" : `'${String(v).replace(/'/g, "''")}'`);
 
