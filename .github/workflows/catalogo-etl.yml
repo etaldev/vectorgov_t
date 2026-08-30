@@ -85,8 +85,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Testes do planner e do backoff
-        run: node --test delta.test.mjs backoff.test.mjs
+      - name: Testes do planner, do backoff e da paginação
+        run: node --test delta.test.mjs backoff.test.mjs paginacao.test.mjs
 
       - name: Fetch CATMAT (API oficial, gratuito)
         run: node --max-old-space-size=4096 fetch-catmat.mjs --out out

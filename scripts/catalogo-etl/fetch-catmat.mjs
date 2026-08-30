@@ -22,7 +22,7 @@
 // parse-csv.mjs (que segue válido para carga manual a partir do CSV local).
 import { createWriteStream, mkdirSync } from "node:fs";
 import { sanearGrupo } from "./sane-grupos.mjs";
-import { esperaRetryMs, MAX_TENTATIVAS } from "./backoff.mjs";
+import { criarBuscadorPagina, PAUSA_ENTRE_PAGINAS_MS } from "./paginacao.mjs";
 
 const args = process.argv.slice(2);
 const OUT = (() => {
@@ -40,10 +40,7 @@ mkdirSync(OUT, { recursive: true });
 const BASE =
   "https://dadosabertos.compras.gov.br/modulo-material/4_consultarItemMaterial";
 const TAMANHO_PAGINA = 500; // máximo aceito pela API
-// ≤ ~92 req/min: o limitador da fonte opera numa janela de ~100 req/min
-// (run 32941544661, 26/08 — com a pausa antiga de 150ms o 429 veio exato na
-// página 101). Custo: ~+6min nas ~688 páginas — irrelevante no cron semanal.
-const PAUSA_ENTRE_PAGINAS_MS = 650;
+// Pacing e retry (429/5xx) moram em paginacao.mjs — orçamento único da fonte.
 
 // Gate de sanidade da fonte: o catálogo completo tem ~343k itens; menos que
 // isso indica truncamento/paginação quebrada — abortar em vez de gerar um
@@ -85,26 +82,7 @@ function montarTextoEmbed(descricao, pdm, classe) {
     .join(" ");
 }
 
-async function buscarPagina(pagina, tentativa = 1) {
-  const url = `${BASE}?pagina=${pagina}&tamanhoPagina=${TAMANHO_PAGINA}`;
-  const res = await fetch(url, {
-    headers: { accept: "application/json" },
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!res.ok) {
-    const corpo = (await res.text()).slice(0, 300);
-    if ((res.status === 429 || res.status >= 500) && tentativa < MAX_TENTATIVAS) {
-      const espera = esperaRetryMs(tentativa, res.headers.get("retry-after"));
-      console.warn(
-        `  ${res.status} na página ${pagina} — retry ${tentativa}/${MAX_TENTATIVAS - 1} em ${espera}ms`,
-      );
-      await new Promise((r) => setTimeout(r, espera));
-      return buscarPagina(pagina, tentativa + 1);
-    }
-    throw new Error(`API ${res.status} na página ${pagina}: ${corpo}`);
-  }
-  return res.json();
-}
+const buscarPagina = criarBuscadorPagina({ base: BASE, tamanhoPagina: TAMANHO_PAGINA });
 
 const sqlStr = (v) => (v === null ? "NULL" : `'${String(v).replace(/'/g, "''")}'`);
 
