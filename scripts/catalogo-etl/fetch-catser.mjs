@@ -16,6 +16,7 @@
 // embed.mjs) + out/catser-d1.sql. Ver README para a ordem de aplicação.
 import { createWriteStream, mkdirSync } from "node:fs";
 import { sanearGrupo } from "./sane-grupos.mjs";
+import { esperaRetryMs, MAX_TENTATIVAS } from "./backoff.mjs";
 
 const args = process.argv.slice(2);
 const OUT = (() => {
@@ -51,9 +52,11 @@ async function buscarPagina(pagina, tentativa = 1) {
   });
   if (!res.ok) {
     const corpo = (await res.text()).slice(0, 300);
-    if ((res.status === 429 || res.status >= 500) && tentativa <= 4) {
-      const espera = 1000 * 2 ** (tentativa - 1);
-      console.warn(`  ${res.status} na página ${pagina} — retry em ${espera}ms`);
+    if ((res.status === 429 || res.status >= 500) && tentativa < MAX_TENTATIVAS) {
+      const espera = esperaRetryMs(tentativa, res.headers.get("retry-after"));
+      console.warn(
+        `  ${res.status} na página ${pagina} — retry ${tentativa}/${MAX_TENTATIVAS - 1} em ${espera}ms`,
+      );
       await new Promise((r) => setTimeout(r, espera));
       return buscarPagina(pagina, tentativa + 1);
     }

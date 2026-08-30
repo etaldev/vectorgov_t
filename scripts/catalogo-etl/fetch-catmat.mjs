@@ -22,6 +22,7 @@
 // parse-csv.mjs (que segue válido para carga manual a partir do CSV local).
 import { createWriteStream, mkdirSync } from "node:fs";
 import { sanearGrupo } from "./sane-grupos.mjs";
+import { esperaRetryMs, MAX_TENTATIVAS } from "./backoff.mjs";
 
 const args = process.argv.slice(2);
 const OUT = (() => {
@@ -39,7 +40,10 @@ mkdirSync(OUT, { recursive: true });
 const BASE =
   "https://dadosabertos.compras.gov.br/modulo-material/4_consultarItemMaterial";
 const TAMANHO_PAGINA = 500; // máximo aceito pela API
-const PAUSA_ENTRE_PAGINAS_MS = 150; // cortesia: ~688 páginas em sequência
+// ≤ ~92 req/min: o limitador da fonte opera numa janela de ~100 req/min
+// (run 32941544661, 26/08 — com a pausa antiga de 150ms o 429 veio exato na
+// página 101). Custo: ~+6min nas ~688 páginas — irrelevante no cron semanal.
+const PAUSA_ENTRE_PAGINAS_MS = 650;
 
 // Gate de sanidade da fonte: o catálogo completo tem ~343k itens; menos que
 // isso indica truncamento/paginação quebrada — abortar em vez de gerar um
@@ -89,9 +93,11 @@ async function buscarPagina(pagina, tentativa = 1) {
   });
   if (!res.ok) {
     const corpo = (await res.text()).slice(0, 300);
-    if ((res.status === 429 || res.status >= 500) && tentativa <= 4) {
-      const espera = 1000 * 2 ** (tentativa - 1);
-      console.warn(`  ${res.status} na página ${pagina} — retry em ${espera}ms`);
+    if ((res.status === 429 || res.status >= 500) && tentativa < MAX_TENTATIVAS) {
+      const espera = esperaRetryMs(tentativa, res.headers.get("retry-after"));
+      console.warn(
+        `  ${res.status} na página ${pagina} — retry ${tentativa}/${MAX_TENTATIVAS - 1} em ${espera}ms`,
+      );
       await new Promise((r) => setTimeout(r, espera));
       return buscarPagina(pagina, tentativa + 1);
     }

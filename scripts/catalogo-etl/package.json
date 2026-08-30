@@ -11,7 +11,7 @@
     "fetch:catser": "node fetch-catser.mjs",
     "delta": "node --max-old-space-size=4096 delta.mjs",
     "embed": "node embed.mjs",
-    "test": "node --test delta.test.mjs"
+    "test": "node --test delta.test.mjs backoff.test.mjs"
   },
   "dependencies": {
     "xlsx": "0.18.5"
